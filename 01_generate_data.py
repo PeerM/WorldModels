@@ -30,7 +30,7 @@ def main(args):
         for i_episode in range(batch_size):
             print('-----')
             observation = env.reset()
-            observation = config.adjust_obs(observation)
+            observation = config.adjust_obs(observation, args.scale)
 
             # plt.imshow(observation)
             # plt.show()
@@ -44,21 +44,22 @@ def main(args):
 
             while t < time_steps: #and not done:
                 t = t + 1
-                
-                action = config.generate_data_action(t, action)
-                
+
+                action = env.action_space.sample()
+                # action = config.generate_data_action(t, action)
+
                 obs_sequence.append(observation)
                 action_sequence.append(action)
 
                 observation, reward, done, info = env.step(action)
-                observation = config.adjust_obs(observation)
+                observation = config.adjust_obs(observation, args.scale)
 
                 if render:
                     env.render()
 
             obs_data.append(obs_sequence)
             action_data.append(action_sequence)
-            
+
             print("Batch {} Episode {} finished after {} timesteps".format(batch, i_episode, t+1))
             print("Current dataset contains {} observations".format(sum(map(len, obs_data))))
 
@@ -78,7 +79,7 @@ if __name__ == "__main__":
   parser.add_argument('--time_steps', type=int, default = 300, help='how many timesteps at start of episode?')
   parser.add_argument('--render', action='store_true', help='render the env as data is generated')
   parser.add_argument('--batch_size', type=int, default = 200, help='how many episodes in a batch (one file)')
-  200
+  parser.add_argument('--scale',action="store_true",help="should the frames be scaled down?")
 
 
   args = parser.parse_args()
